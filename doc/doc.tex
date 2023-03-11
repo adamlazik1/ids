@@ -5,9 +5,11 @@
 Michal Ľaš}
 
 \usepackage[slovak]{babel}
-\usepackage[left=3cm,  top=3cm]{geometry}
+\usepackage[left=3cm, top=3cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{float}
 
 \begin{document}
 
@@ -20,21 +22,33 @@ Zadanie sme pojali ako vytvorenie interného informačného systému českej sta
 
 \section{Prípady užitia}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{StavebnaFirmaUseCase.png}
+    \caption{Diagram prípadov užitia}
+\end{figure}
+
 So systémom môžu manipulovať zamestnanci firmy.
-Bežný zamestnanec si môže nechať zobraziť svoju výplatnú pásku za každý mesiac a informácie o objednávkach, na ktorých pracuje alebo pracoval.
+Bežný zamestnanec si môže nechať zobraziť svoju výplatnú pásku za každý mesiac.
 
-Stavbyvedúci môže navyše vyhľadať všetky objednávky zákazníkov a objednávkach materiálu, zadať informácie o novej objednávke materiálu a zadať odpracované hodiny podriadených zamestnancov.
+Stavbyvedúci môže navyše vyhľadať objednávky zákazníkov a objednávky materiálu, zadať informácie o novej objednávke materiálu a zadať odpracované hodiny podriadených zamestnancov.
 
-Sekretárka môže vykonávať všetky akcie ako stavbyvedúci a navyše môže zadávať údaje o nových zamestnancoch a nové objednávky zákazníkov a vypĺňať výplatné pásky zamestnancov.
+Sekretárka môže vykonávať všetky akcie ako stavbyvedúci a navyše môže zadávať údaje o nových zamestnancoch a zákazníkoch a nové objednávky zákazníkov a vypĺňať výplatné pásky zamestnancov.
 Sektretárka tiež môže všetky tieto údaje meniť pre prípad, že by pri zadávaní údajov došlo k chybe.
 
 \section{Dátový model}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth,height=0.7\textheight,keepaspectratio]{StavebnaFirma.png}
+    \caption{ER diagram}
+\end{figure}
+
 Informačný systém uchováva kontaktné údaje o zákazníkoch firmy.
 Pre jednoznačné rozlíšenie zákazníkov je každému zákazníkovi informačným systémom vygenerované jedinečné ID.\@
 
-Zákazník môže zadávať objednávky.
-Pri vytvorení záynamu o zákazníkovi poverenou osobou zákazník nemusí mať zadanú žiadnu objednávku.
+IS uchováva objednávky zákazníkov.
+Pri vytvorení záznamu o zákazníkovi poverenou osobou zákazník nemusí mať zadanú žiadnu objednávku.
 Každá objednávka má informačným systémom vygenerované jedinečné číslo objednávky, ktoré ju identifikuje.
 V objednávke uchovávame adresu, kde sa konajú stavebné práce, cenu, dátum začiatku a konca výstavby (dátum kolaudácie), stručný jednovetový popis, napr. \textbf{výstavba obytného domu}, status, napr. \textbf{v procese} alebo \textbf{dokončená}, a dátum poslednej úpravy špecifikácie.
 Samotnú špecifikáciu obsahujúcu požiadavky zákazníka a detailný plán výstavby považujeme za príliš veľkú na to, aby bolo uloženie v databáze efektívne, preto sa tieto budú ukladať do súborov mimo databáze a v databázi je uložená iba  cesta k tomuto súboru.\@
@@ -48,11 +62,15 @@ Samotný dokument o objednávke znovu považujeme za priveľký na uskladnenie v
 IS ďalej uchováva informácie o externých a interných zamestnancoch firmy.
 Interných zamestnancov jednoznačne identifikuje číslo zdravotného preukazu, pretože človek pracujúci v Českej republike musí mať české zdravotné poistenie.
 
-Okrem osobných, kontaktných a platobných údajov ďalej IS uchováva o zamestnancovi typ úväzku, ktorý je vyjadrený počtom hodín práce za pracovný deň a hodiny platenej a neplatenej dovolenky za rok.
+Okrem osobných, kontaktných a platobných údajov ďalej IS uchováva o zamestnancovi typ úväzku, ktorý je vyjadrený počtom hodín práce za pracovný deň, hodiny platenej a neplatenej dovolenky za rok plat na hodinu.
 
-Špeciálny prípad zamestnanca je stavbyvedúci, ktorý môže zadávať objednavky na materiál.
+Zamestnanec môže mať nula (bežný pracovník) až n (stavbyvedúci\dots) podriadených a nula (riaditeľ) až jedného (ostatní) priameho nadriadeného.
 
-IS ukladá výplatné listiny zamestnancov za každý mesiac, v ktorých ukladá plat na hodinu (môže sa meniť, preto sa ukladá každý mesiac), počet odpracovaných hodín, počet hodín platenej a neplatenej dovolenky a finančné odmeny nad rámec platu získané v daný mesiac.
+Špeciálny prípad zamestnanca je poverený pracovník\,--\,kam spadá sekretárka, stavbyvedúci a riaditeľ\,--\,ktorý môže zadávať objednavky na materiál a  kupovať pracovné vybavenie.
+
+Vybavenie je identifikované unikátnym ID a uchováva sa o ňom cena, druh, stav (napr. \textbf{nepoškodený} alebo \textbf{opotrebovaný}), dátum nákupu a cesta k nákupnej zmluve.
+
+IS ukladá výplatné listiny zamestnancov za každý mesiac. Vo výplatnej listine sa nachádza počet odpracovaných hodín a celková mzda (aby sa dal spätne vypočítať hodinový plat za každý mesiac), počet hodín platenej a neplatenej dovolenky a finančné odmeny nad rámec platu získané v daný mesiac.
 
 Na objednávkach ďalej môžu pracovať externí zamestnanci, tzn.\ firmy alebo živnostníci, ktorých objednáva stavebná firma na konkrétnu objednávku.
 Externí zamestnanci sú jednoznačne identifikovaní \textbf{IČO}m a ďalej IS o nich ukladá kontaktné a platobné údaje a špecializáciu.

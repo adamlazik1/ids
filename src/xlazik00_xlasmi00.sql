@@ -29,7 +29,7 @@ CREATE TABLE zakaznik (
 
 
 CREATE TABLE objednavka (
-    cislo_objednavky NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    cislo_objednavky NUMBER(8) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Ulica VARCHAR2(32) NOT NULL,
     Mesto VARCHAR2(32) NOT NULL,
     PSC NUMBER(5) NOT NULL,
@@ -40,35 +40,15 @@ CREATE TABLE objednavka (
     posledna_uprava DATE,
     Specifikacia VARCHAR2(255),
     
+    ID_zakaznik NUMBER(10) NOT NULL,
     CONSTRAINT fk_objednavka_zakaznik FOREIGN KEY (ID_zakaznik) 
     REFERENCES zakaznik(ID_zakaznik)
     ON DELETE SET NULL
 );
 
 
-CREATE TABLE material (
-    ID_objednavky NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    cislo_objednavky NUMBER NOT NULL,
-    Druh VARCHAR2(32) NOT NULL,
-    Mnozstvo NUMBER NOT NULL,
-    Jednotka VARCHAR2 NOT NULL,
-    Cena NUMBER NOT NULL,
-    Dodávateľ VARCHAR2(32),
-    Datum DATE NOT NULL,
-    nakupna_zmluva VARCHAR2(255),
-    
-    CONSTRAINT fk_material_objednavka FOREIGN KEY (cislo_objednavky) 
-    REFERENCES objednavka(cislo_objednavky)
-    ON DELETE CASCADE,
-    
-    CONSTRAINT fk_material_pracovnik FOREIGN KEY (ID_zamestnanca) 
-    REFERENCES povereny_pracovnik(ID_zamestnanca)
-    ON DELETE CASCADE
-);
-
-
 CREATE TABLE zamestnanec (
-    ID_zamestnanca NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ID_zamestnanca NUMBER(8) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Priezvisko VARCHAR2(32) NOT NULL,
     Meno VARCHAR2(32) NOT NULL,
     Titul VARCHAR2(32),
@@ -76,12 +56,12 @@ CREATE TABLE zamestnanec (
     Tel NUMBER(10) NOT NULL,
     Email VARCHAR2(32) NOT NULL,
     cislo_uctu NUMBER(16) NOT NULL,  -- TODO: CHECK --
-    var_symbol NUMBER(8) GENERATED ALWAYS AS IDENTITY NOT NULL
+    var_symbol NUMBER(8) NOT NULL
 );
 
 
 CREATE TABLE externy_zamestnanec (
-    ID_zamestnanca PRIMARY KEY,
+    ID_zamestnanca NUMBER(8) PRIMARY KEY,
     ICO NUMBER(8), -- TODO: CHECK --
     DIC VARCHAR2(16) NOT NULL,
     nazov_firmy VARCHAR2(64) NOT NULL,
@@ -94,7 +74,7 @@ CREATE TABLE externy_zamestnanec (
 
 
 CREATE TABLE vlastny_zamestnanec (
-    ID_zamestnanca PRIMARY KEY,
+    ID_zamestnanca NUMBER(8) PRIMARY KEY,
     cislo_zdravotneho_preukazu NUMBER, -- TODO: NUMBER(?), CHECK --
     datum_narodenia DATE NOT NULL,
     plat_hod NUMBER(8) NOT NULL,
@@ -117,18 +97,30 @@ CREATE TABLE vlastny_zamestnanec (
 );
 
 
+CREATE TABLE povereny_pracovnik(
+    ID_zamestnanca NUMBER(8) PRIMARY KEY,
+    
+    CONSTRAINT fk_povereny_zamestnanec
+    FOREIGN KEY (ID_zamestnanca)
+    REFERENCES vlastny_zamestnanec(ID_zamestnanca)
+    ON DELETE CASCADE
+);
+
+
 CREATE TABLE pracuje (
-    cislo_objednavky NUMBER NOT NULL,
-    ID_zamestnanca NUMBER NOT NULL,-- TODO: NUMBER(?) --
+    cislo_objednavky NUMBER(8) NOT NULL,
+    ID_zamestnanca NUMBER(8) NOT NULL,
     datum_od DATE NOT NULL,
     datum_do DATE,
     druh_prace VARCHAR2(500) NOT NULL,
     
     PRIMARY KEY(cislo_objednavky, ID_zamestnanca), 
-    CONSTRAINT fk_objednavka FOREIGN KEY (cislo_objednavky) REFERENCES objednavka(cislo_objednavky) 
+    CONSTRAINT fk_objednavka FOREIGN KEY (cislo_objednavky)
+    REFERENCES objednavka(cislo_objednavky) 
     ON DELETE CASCADE,
     
-    CONSTRAINT fk_preukaz FOREIGN KEY (ID_zamestnanca) REFERENCES zamestnanec(ID_zamestnanca) 
+    CONSTRAINT fk_preukaz FOREIGN KEY (ID_zamestnanca)
+    REFERENCES zamestnanec(ID_zamestnanca) 
     ON DELETE CASCADE
 );
 
@@ -141,6 +133,7 @@ CREATE TABLE vyplatna_listina (
     neplatena_dovolenka NUMBER(2),
     financne_odmeny NUMBER(8),
     
+    ID_zamestnanca NUMBER(8) NOT NULL,
     CONSTRAINT fk_listina_zamestnanec FOREIGN KEY (ID_zamestnanca)
     REFERENCES zamestnanec(ID_zamestnanca)
     ON DELETE CASCADE
@@ -155,18 +148,31 @@ CREATE TABLE vybavenie (
     datum_nakupu DATE NOT NULL,
     nakupna_zmluva VARCHAR2(255),
     
+    ID_zamestnanca NUMBER(8) NOT NULL,
     CONSTRAINT fk_vybavenie_zamestnanec FOREIGN KEY (ID_zamestnanca)
     REFERENCES povereny_pracovnik(ID_zamestnanca)
     ON DELETE SET NULL
 );
 
 
-CREATE TABLE povereny_pracovnik(
-    ID_zamestnanca PRIMARY KEY,
+CREATE TABLE material (
+    ID_objednavky NUMBER(8) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    cislo_objednavky NUMBER(8) NOT NULL,
+    ID_zamestnanca NUMBER(8) NOT NULL,
+    Druh VARCHAR2(32) NOT NULL,
+    Mnozstvo NUMBER NOT NULL,
+    Jednotka VARCHAR2(16) NOT NULL,
+    Cena NUMBER NOT NULL,
+    Dodávateľ VARCHAR2(32),
+    Datum DATE NOT NULL,
+    nakupna_zmluva VARCHAR2(255),
     
-    CONSTRAINT fk_povereny_zamestnanec
-    FOREIGN KEY (ID_zamestnanca)
-    REFERENCES vlastny_zamestnanec(ID_zamestnanca)
+    CONSTRAINT fk_material_objednavka FOREIGN KEY (cislo_objednavky) 
+    REFERENCES objednavka(cislo_objednavky)
+    ON DELETE CASCADE,
+    
+    CONSTRAINT fk_material_pracovnik FOREIGN KEY (ID_zamestnanca) 
+    REFERENCES povereny_pracovnik(ID_zamestnanca)
     ON DELETE CASCADE
 );
 
@@ -179,16 +185,19 @@ CREATE TABLE povereny_pracovnik(
 -----------------------
 -- zmazanie tabuliek --
 -----------------------
+-- SELECT * FROM USER_CONSTRAINTS WHERE TABLE_NAME = "povereny_pracovnik";
 
-DROP TABLE zakaznik;
-DROP TABLE objednavka;
-DROP TABLE material;
-DROP TABLE zamestnanec;
-DROP TABLE externy_zamestnanec;
-DROP TABLE vlastny_zamestnanec;
-DROP TABLE pracuje;
-DROP TABLE vyplatna_listina;
-DROP TABLE vybavenie;
-DROP TABLE povereny_pracovnik;
+DROP TABLE zakaznik CASCADE CONSTRAINTS;
+DROP TABLE pracuje CASCADE CONSTRAINTS;
+DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
+DROP TABLE material CASCADE CONSTRAINTS;
+DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
+DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE vybavenie CASCADE CONSTRAINTS;
+DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE objednavka CASCADE CONSTRAINTS;
+DROP TABLE zamestnanec CASCADE CONSTRAINTS;
+
+
 
 -- konec suboru --

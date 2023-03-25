@@ -1,0 +1,4 @@
+root = true
+
+[*.sql]
+trim_trailing_whitespace = true

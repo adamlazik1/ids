@@ -55,7 +55,7 @@ CREATE TABLE zakaznik (
     Priezvisko VARCHAR2(64) NOT NULL,
     Meno VARCHAR2(64) NOT NULL,
     Titul VARCHAR2(32),
-    Tel VARCHAR2(10) NOT NULL, -- skladovanie ciselnych hodnot vo v stringu kvoli veducim nulam
+    Tel VARCHAR2(16) NOT NULL, -- skladovanie ciselnych hodnot vo v stringu kvoli veducim nulam
     Email VARCHAR2(64) NOT NULL,
     Ulica VARCHAR2(64) NOT NULL,
     Mesto VARCHAR2(64) NOT NULL,
@@ -94,9 +94,9 @@ CREATE TABLE zamestnanec (
     Meno VARCHAR2(32) NOT NULL,
     Titul VARCHAR2(32),
     Specializacia VARCHAR2(64) NOT NULL,
-    Tel VARCHAR2(10) NOT NULL,
+    Tel VARCHAR2(16) NOT NULL,
     Email VARCHAR2(32) NOT NULL,
-    Cislo_uctu VARCHAR2(16) NOT NULL,  -- TODO: CHECK --
+    Cislo_uctu VARCHAR(22) NOT NULL,  -- TODO: CHECK --
     Var_symbol NUMBER(8) DEFAULT Var_symbol_seq.NEXTVAL
 );
 
@@ -104,7 +104,7 @@ CREATE TABLE zamestnanec (
 CREATE TABLE externy_zamestnanec (
     ID_zamestnanca NUMBER(8) PRIMARY KEY,
     ICO VARCHAR2(8), -- TODO: CHECK --
-    DIC VARCHAR2(16) NOT NULL,
+    DIC VARCHAR2(12) NOT NULL,
     Nazov_firmy VARCHAR2(64) NOT NULL,
 
     CONSTRAINT fk_externy_zamestnanec

@@ -32,7 +32,6 @@ DROP TABLE zamestnanec CASCADE CONSTRAINTS;
 -- zmazanie seqvencii
 
 DROP SEQUENCE Var_symbol_seq;
-DROP SEQUENCE zakaznik_seq;
 
 
 -------------------------
@@ -46,18 +45,13 @@ MAXVALUE 99999999
 NOCACHE
 NOCYCLE;
 
-
-CREATE SEQUENCE zakaznik_seq
-START WITH 1
-INCREMENT BY 1;
-
 -------------------------
 -- vytvaranie tabuliek --
 -------------------------
 
 
 CREATE TABLE zakaznik (
-    ID_zakaznik NUMBER(10) DEFAULT zakaznik_seq.NEXTVAL PRIMARY KEY,
+    ID_zakaznik NUMBER(10) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Priezvisko VARCHAR2(64) NOT NULL,
     Meno VARCHAR2(64) NOT NULL,
     Titul VARCHAR2(32),

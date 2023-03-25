@@ -55,11 +55,11 @@ CREATE TABLE zakaznik (
     Priezvisko VARCHAR2(64) NOT NULL,
     Meno VARCHAR2(64) NOT NULL,
     Titul VARCHAR2(32),
-    Tel NUMBER(10) NOT NULL,
+    Tel VARCHAR2(10) NOT NULL, -- skladovanie ciselnych hodnot vo v stringu kvoli veducim nulam
     Email VARCHAR2(64) NOT NULL,
     Ulica VARCHAR2(64) NOT NULL,
     Mesto VARCHAR2(64) NOT NULL,
-    PSC NUMBER(5) NOT NULL
+    PSC VARCHAR2(5) NOT NULL
 );
 
 
@@ -67,7 +67,7 @@ CREATE TABLE objednavka (
     Cislo_objednavky NUMBER(8) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Ulica VARCHAR2(64) NOT NULL,
     Mesto VARCHAR2(64) NOT NULL,
-    PSC NUMBER(5) NOT NULL,
+    PSC VARCHAR2(5) NOT NULL,
     Zaciatok_vystavby DATE,
     Ukoncenie_vystavby DATE,
     Popis VARCHAR2(500),
@@ -94,16 +94,16 @@ CREATE TABLE zamestnanec (
     Meno VARCHAR2(32) NOT NULL,
     Titul VARCHAR2(32),
     Specializacia VARCHAR2(64) NOT NULL,
-    Tel NUMBER(10) NOT NULL,
+    Tel VARCHAR2(10) NOT NULL,
     Email VARCHAR2(32) NOT NULL,
-    Cislo_uctu NUMBER(16) NOT NULL,  -- TODO: CHECK --
+    Cislo_uctu VARCHAR2(16) NOT NULL,  -- TODO: CHECK --
     Var_symbol NUMBER(8) DEFAULT Var_symbol_seq.NEXTVAL
 );
 
 
 CREATE TABLE externy_zamestnanec (
     ID_zamestnanca NUMBER(8) PRIMARY KEY,
-    ICO NUMBER(8), -- TODO: CHECK --
+    ICO VARCHAR2(8), -- TODO: CHECK --
     DIC VARCHAR2(16) NOT NULL,
     Nazov_firmy VARCHAR2(64) NOT NULL,
 
@@ -116,14 +116,14 @@ CREATE TABLE externy_zamestnanec (
 
 CREATE TABLE vlastny_zamestnanec (
     ID_zamestnanca NUMBER(8) PRIMARY KEY,
-    Cislo_zdravotneho_preukazu NUMBER, -- TODO: NUMBER(?), CHECK --
+    Cislo_zdravotneho_preukazu VARCHAR(32),
     Datum_narodenia DATE NOT NULL,
     Plat_hod NUMBER(8) NOT NULL,
     Uvazok VARCHAR2(16) NOT NULL,
     Dovolenka_dni NUMBER NOT NULL,
     Ulica VARCHAR2(32) NOT NULL,
     Mesto VARCHAR2(32) NOT NULL,
-    PSC NUMBER(5) NOT NULL,
+    PSC VARCHAR(5) NOT NULL,
     Cislo_OP VARCHAR2(8) NOT NULL,
     Datum_nastupu DATE NOT NULL,
     Datum_ukoncenia DATE,

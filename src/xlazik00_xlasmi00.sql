@@ -339,20 +339,4 @@ VALUES ('Bager', '6000000', 'Novy', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
 VALUES ('Tehly', '20', 't', 22000, 'BOUMIT', TO_DATE('1972-07-30', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343242.pdf', '1', '2');
 
-
--------------------
--- vypis tabuliek -
--------------------
-
-SELECT * FROM zakaznik;
-SELECT * FROM objednavka;
-SELECT * FROM zamestnanec;
-SELECT * FROM externy_zamestnanec;
-SELECT * FROM vlastny_zamestnanec;
-SELECT * FROM povereny_pracovnik;
-SELECT * FROM vyplatna_listina;
-SELECT * FROM vybavenie;
-SELECT * FROM material;
-
-
 -- Koniec súboru --

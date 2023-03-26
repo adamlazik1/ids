@@ -4,26 +4,9 @@
 * Dátum: 26.03.2023
 */
 
------------------------
-------- Mazanie -------
------------------------
-
--- Zmazanie tabuliek
-
-DROP TABLE zakaznik CASCADE CONSTRAINTS;
-DROP TABLE pracuje CASCADE CONSTRAINTS;
-DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
-DROP TABLE material CASCADE CONSTRAINTS;
-DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
-DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
-DROP TABLE vybavenie CASCADE CONSTRAINTS;
-DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
-DROP TABLE objednavka CASCADE CONSTRAINTS;
-DROP TABLE zamestnanec CASCADE CONSTRAINTS;
-
--- Zmazanie sekvencií
-
-DROP SEQUENCE Var_symbol_seq;
+---------------------------------------------
+------- Definície overovacích funkcií -------
+---------------------------------------------
 
 CREATE OR REPLACE TYPE numarray IS VARRAY(10) of NUMBER;
 /

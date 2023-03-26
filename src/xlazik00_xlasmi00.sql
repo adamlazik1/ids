@@ -1,21 +1,14 @@
 /**
-* File: xlazik00_xlasmi00.sql
-* Authors: Adam Lazík (xlazik00), Michal Ľaš (xlasmi00)
-* Brief: SQL script for IDS project 2
-* Date: 19.03.2023
-*
+* Súbor: xlazik00_xlasmi00.sql
+* Autori: Adam Lazík (xlazik00), Michal Ľaš (xlasmi00)
+* Dátum: 26.03.2023
 */
 
--- TODO: CHECKs (napr. hodnoty ktory by nemali byt < 0, datumy aby sedeli, ...)
--- TODO: pri 'Cislo_zdravotneho_preukazu' doplnit max dlzku
--- TODO: upravit inserty (len nech su krajsie a zmysluplnejsie)
-
-
 -----------------------
-------- mazanie -------
+------- Mazanie -------
 -----------------------
 
--- zmazanie tabuliek
+-- Zmazanie tabuliek
 
 DROP TABLE zakaznik CASCADE CONSTRAINTS;
 DROP TABLE pracuje CASCADE CONSTRAINTS;
@@ -28,13 +21,13 @@ DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
 DROP TABLE objednavka CASCADE CONSTRAINTS;
 DROP TABLE zamestnanec CASCADE CONSTRAINTS;
 
--- zmazanie seqvencii
+-- Zmazanie sekvencií
 
 DROP SEQUENCE Var_symbol_seq;
 
 CREATE OR REPLACE TYPE numarray IS VARRAY(10) of NUMBER;
 /
--- Validacia cisla uctu podla https://www.kutac.cz/pocitace-a-internety/jak-poznat-spravne-cislo-uctu
+-- Validácia čísla účtu podľa https://www.kutac.cz/pocitace-a-internety/jak-poznat-spravne-cislo-uctu
 CREATE OR REPLACE FUNCTION VERIFY_BANK_ACCOUNT_NUMBER(acc_no_full IN VARCHAR2) RETURN NUMBER DETERMINISTIC IS
     acc_no VARCHAR2(10);
     prefix VARCHAR2(10);
@@ -67,7 +60,7 @@ BEGIN
     END IF;
 END;
 /
--- Validacia ICA podla https://cs.wikipedia.org/wiki/Identifika%C4%8Dn%C3%AD_%C4%8D%C3%ADslo_osoby
+-- Validácia IČA podľa https://cs.wikipedia.org/wiki/Identifika%C4%8Dn%C3%AD_%C4%8D%C3%ADslo_osoby
 CREATE OR REPLACE FUNCTION VERIFY_ICO(ico IN VARCHAR2) RETURN NUMBER DETERMINISTIC IS
     weights numarray;
     total NUMBER;
@@ -75,7 +68,7 @@ BEGIN
     IF (REGEXP_LIKE(ico, '\d{8}') = FALSE) THEN
         RETURN 0;
     END IF;
-    -- posledne tri cislice niesu pouzite ale zabranuju nutnosti definovat novy datovy typ
+    -- Posledné tri číslice nie sú použité ale zabraňujú nutnosti definovať nový dátový typ
     weights := numarray(8, 7, 6, 5, 4, 3, 2, 0, 0, 0);
     total := 0;
     FOR i in 1 .. 7 LOOP
@@ -89,7 +82,7 @@ BEGIN
 END;
 /
 -------------------------
--- vytvaranie seqvecii --
+-- Vytváranie sekvecií --
 -------------------------
 
 CREATE SEQUENCE Var_symbol_seq
@@ -100,7 +93,7 @@ NOCACHE
 NOCYCLE;
 
 -------------------------
--- vytvaranie tabuliek --
+-- Vytváranie tabuliek --
 -------------------------
 
 
@@ -109,14 +102,15 @@ CREATE TABLE zakaznik (
     Priezvisko VARCHAR2(64) NOT NULL,
     Meno VARCHAR2(64) NOT NULL,
     Titul VARCHAR2(32),
-    Tel VARCHAR2(16) NOT NULL, -- skladovanie ciselnych hodnot vo v stringu kvoli veducim nulam
+    -- Skladovanie číselných hodnôt vo VARCHAR2 kvôli vedúcim nulám
+    Tel VARCHAR2(16) NOT NULL,
     Email VARCHAR2(64) NOT NULL,
     Ulica VARCHAR2(64) NOT NULL,
     Mesto VARCHAR2(64) NOT NULL,
     PSC VARCHAR2(5) NOT NULL,
 
     CONSTRAINT Zk_check_email CHECK (REGEXP_LIKE(Email, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$')),
-    -- podporovane standardne formaty ceskych tel. c.:
+    -- Podporované sú najbežnejšie formáty českých tel. č.:
     -- +420 777 777 777
     -- +420777777777
     -- 777 777 777
@@ -136,7 +130,7 @@ CREATE TABLE objednavka (
     Popis VARCHAR2(500),
     Status VARCHAR2(32),
     Posledna_uprava DATE,
-    Specifikacia VARCHAR2(255), -- Cesta k suboru so specifikaciou
+    Specifikacia VARCHAR2(255), -- Cesta k súboru so špecifikáciou
 
     CONSTRAINT Obj_check_PSC CHECK (REGEXP_LIKE(PSC, '\d{5}')),
 
@@ -148,11 +142,12 @@ CREATE TABLE objednavka (
 
 
 -------------------------------------------
--- Generalizacia/Specializacia
--- Vztahy boli upravene podla spatnej vazby hodnotenia prvej casti projektu
--- nadtyp (zamestnanec) + podtyp (externy_zamestnanec) + podtyp (vlastny_zamestnanec)
--- nadtyp (vlastny_zamestnanec) + podtyp (povereny_pracovnik)
--- podtypy obsahuju primarny kluc natypu
+-- Generalizácia/Špecializácia
+-- Vzťahy boli upravené podľa spätnej väzby hodnotenia prvej časti projektu
+-- Nadtyp (zamestnanec) + podtyp (externy_zamestnanec) + podtyp (vlastny_zamestnanec)
+-- Nadtyp (vlastny_zamestnanec) + podtyp (povereny_pracovnik)
+-- Podtypy obsahujú primárny kľúč nadtypu
+-- Zvolili sme tento spôsob kvôli prehľadnosti
 
 CREATE TABLE zamestnanec (
     ID_zamestnanca NUMBER(8) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -168,7 +163,7 @@ CREATE TABLE zamestnanec (
     CONSTRAINT Zm_check_email CHECK (REGEXP_LIKE(Email, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$')),
     CONSTRAINT Zm_check_tel CHECK (REGEXP_LIKE(Tel, '(\+\d{3} ?)?(\d{3} ?){2}\d{3}')),
 
-    -- funkcie nemozu byt volane v CHECK priamo, nutnost vytvorit extra stlpec
+    -- Užívateľské funkcie nemôžu byť volané v CHECK priamo, nutnosť vytvoriť extra stĺpec s výsledkom funkcie
     Ucet_valid NUMBER(1) GENERATED ALWAYS AS (VERIFY_BANK_ACCOUNT_NUMBER(Cislo_uctu)) VIRTUAL,
     CONSTRAINT Zm_check_cislo_uctu CHECK (Ucet_valid = 1)
 );
@@ -194,7 +189,7 @@ CREATE TABLE vlastny_zamestnanec (
     ID_zamestnanca NUMBER(8) PRIMARY KEY,
     Cislo_zdravotneho_preukazu VARCHAR(32),
     Datum_narodenia DATE NOT NULL,
-    Plat_hod NUMBER(8) NOT NULL, -- predpoklada sa plat v CZK
+    Plat_hod NUMBER(8) NOT NULL, -- Predpokladá sa plat v CZK
     Uvazok VARCHAR2(16) NOT NULL,
     Dovolenka_dni NUMBER NOT NULL,
     Ulica VARCHAR2(32) NOT NULL,
@@ -206,7 +201,7 @@ CREATE TABLE vlastny_zamestnanec (
 
     CONSTRAINT Zm_check_PSC CHECK (REGEXP_LIKE(PSC, '\d{5}')),
     CONSTRAINT Zm_check_Cislo_OP CHECK (REGEXP_LIKE(Cislo_OP, '[A-Z]{2}\d{6}')),
-    -- Cislo zdravotneho preukazu nema pevne dany format kedze cudzincom je pridelene v inom formate ako ceskym obcanom
+    -- Číslo zdravotného preukazu nemá pevne daný formát keďže cudzincom je pridelené v inom formáte ako českým občanom
     CONSTRAINT Zm_check_Cislo_zdravotneho_preukazu CHECK (REGEXP_LIKE(Cislo_zdravotneho_preukazu, '^\d+$')),
     CONSTRAINT Zm_check_Dovolenka_dni CHECK (Dovolenka_dni >= 0),
     CONSTRAINT Zm_check_Plat_hod CHECK (Plat_hod > 0),
@@ -292,7 +287,7 @@ CREATE TABLE material (
     Cena NUMBER NOT NULL,
     Dodavatel VARCHAR2(32),
     Datum DATE NOT NULL,
-    Nakupna_zmluva VARCHAR2(255), -- cesta k suboru
+    Nakupna_zmluva VARCHAR2(255), -- Cesta k súboru
 
     CONSTRAINT Mt_check_Cena CHECK (Cena >= 0),
 
@@ -306,7 +301,7 @@ CREATE TABLE material (
 );
 
 -------------------
--- ukazkove data --
+-- Ukážkové dáta --
 -------------------
 
 INSERT INTO zakaznik(Priezvisko, Meno, Titul, Tel, Email, Ulica, Mesto, PSC)
@@ -358,4 +353,4 @@ SELECT * FROM vybavenie;
 SELECT * FROM material;
 
 
--- konec suboru --
+-- Koniec súboru --

@@ -251,9 +251,9 @@ CREATE TABLE pracuje (
 
 
 CREATE TABLE vyplatna_listina (
-    Datum DATE DEFAULT TRUNC(SYSDATE, 'MM') PRIMARY KEY,
-    Odrobenych_hod NUMBER(5) NOT NULL,
-    Mzda NUMBER NOT NULL,
+    Datum DATE PRIMARY KEY,
+    Odrobenych_hod NUMBER(5),
+    Mzda NUMBER,
     Platena_dovolenka NUMBER(2),
     Neplatena_dovolenka NUMBER(2),
     Financne_odmeny NUMBER(8),

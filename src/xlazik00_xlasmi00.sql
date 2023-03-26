@@ -313,7 +313,7 @@ INSERT INTO zakaznik(Priezvisko, Meno, Titul, Tel, Email, Ulica, Mesto, PSC)
 VALUES ('Kopernik', 'Mikulas', 'Ing.', '+421 906 452 987', 'kopernik@mail.com', 'Bozechtova', 'Brno', '05247');
 
 INSERT INTO objednavka(Ulica, Mesto, PSC, Zaciatok_vystavby, Ukoncenie_vystavby, Popis, Status, Posledna_uprava, Specifikacia, ID_zakaznik)
-VALUES ('Metodejova', 'Brno', '06484', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, NULL, NULL, NULL, 1);
+VALUES ('Metodejova', 'Brno', '06484', TO_DATE('2023-07-30', 'yyyy/mm/dd'), NULL, 'Stavba rodinného domu', 'Nezačatá', NULL, '/home/objednavky/1/spec.pdf', 1);
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Newton', 'Isac', 'Ing.', 'Statik', '+421907442954', 'newton@mail.com', '0000111333/2700');
@@ -323,22 +323,24 @@ VALUES ('25596641', 'CZ25596641', 'Stavmont', '1');
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Tesla', 'Nicola', 'Ing.', 'Elektrika', '775442954', 'tesla@mail.com', '86-0199488014/0300');
 INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), '8', 'Plny', '30', 'Ceska', 'Brno', '02354', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, '2');
+VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 200, 'Plny', 30, 'Ceska', 'Brno', '02354', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
 
 INSERT INTO povereny_pracovnik(ID_zamestnanca)
 VALUES (2);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
-VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyveduci', '1', '2');
+VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyveduci', 1, 2);
 
+-- Pri vytvorení výplatnej pásky na začiatku mesiaca nie sú známe údaje ako odpracované hodiny, atď.
+-- Tie sa zadávajú a upravujú priebežne počas mesiaca
 INSERT INTO vyplatna_listina(Datum, Odrobenych_hod, Mzda, Platena_dovolenka, Neplatena_dovolenka, Financne_odmeny, ID_zamestnanca)
-VALUES (TO_DATE('1972-07', 'yyyy/mm'), '98', '1800', NULL, NULL, NULL, '2');
+VALUES (TO_DATE('1972-07', 'yyyy/mm'), NULL, NULL, NULL, NULL, NULL, 2);
 
 INSERT INTO vybavenie(Druh, Cena, Stav, Datum_nakupu, Nakupna_zmluva, ID_zamestnanca)
-VALUES ('Bager', '6000', 'Novy', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '2');
+VALUES ('Bager', '6000000', 'Novy', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '2');
 
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
-VALUES ('Tehly', '20', 't', '600', 'BOUMIT', TO_DATE('1972-07-30', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343242.pdf', '1', '2');
+VALUES ('Tehly', '20', 't', 22000, 'BOUMIT', TO_DATE('1972-07-30', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343242.pdf', '1', '2');
 
 
 -------------------

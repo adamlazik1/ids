@@ -191,7 +191,8 @@ CREATE TABLE vlastny_zamestnanec (
     Datum_narodenia DATE NOT NULL,
     Plat_hod NUMBER(8) NOT NULL, -- Predpokladá sa plat v CZK
     Uvazok VARCHAR2(16) NOT NULL,
-    Dovolenka_dni NUMBER NOT NULL,
+    Platena_dovolenka_dni NUMBER NOT NULL,
+    Neplatena_dovolenka_dni NUMBER NOT NULL,
     Ulica VARCHAR2(32) NOT NULL,
     Mesto VARCHAR2(32) NOT NULL,
     PSC VARCHAR(5) NOT NULL,
@@ -203,8 +204,9 @@ CREATE TABLE vlastny_zamestnanec (
     CONSTRAINT Zm_check_Cislo_OP CHECK (REGEXP_LIKE(Cislo_OP, '[A-Z]{2}\d{6}')),
     -- Číslo zdravotného preukazu nemá pevne daný formát keďže cudzincom je pridelené v inom formáte ako českým občanom
     CONSTRAINT Zm_check_Cislo_zdravotneho_preukazu CHECK (REGEXP_LIKE(Cislo_zdravotneho_preukazu, '^\d+$')),
-    CONSTRAINT Zm_check_Dovolenka_dni CHECK (Dovolenka_dni >= 0),
     CONSTRAINT Zm_check_Plat_hod CHECK (Plat_hod > 0),
+    CONSTRAINT Zm_check_Platena_dovolenka_dni CHECK (Platena_dovolenka_dni >= 0),
+    CONSTRAINT Zm_check_Neplatena_dovolenka_dni CHECK (Neplatena_dovolenka_dni >= 0),
 
     nadriadeny NUMBER REFERENCES vlastny_zamestnanec(ID_zamestnanca)
     ON DELETE SET NULL,
@@ -317,8 +319,8 @@ VALUES ('25596641', 'CZ25596641', 'Stavmont', '1');
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Tesla', 'Nicola', 'Ing.', 'Elektrika', '775442954', 'tesla@mail.com', '86-0199488014/0300');
-INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 200, 'Plny', 30, 'Ceska', 'Brno', '02354', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
+INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Platena_dovolenka_dni, Neplatena_dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
+VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 200, 'Plny', 30, 45, 'Ceska', 'Brno', '02354', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
 
 INSERT INTO povereny_pracovnik(ID_zamestnanca)
 VALUES (2);

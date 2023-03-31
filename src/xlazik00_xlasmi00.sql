@@ -322,4 +322,57 @@ VALUES ('Bager', '6000000', 'Novy', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
 VALUES ('Tehly', '20', 't', 22000, 'BOUMIT', TO_DATE('1972-07-30', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343242.pdf', '1', '2');
 
+
+-------------------
+----- Selekty -----
+-------------------
+
+-- Spojenie dvoch tabuliek
+-- Aký materiál je pridelený objednávke číslo '1' (ID objednávky, druh, množstvo, jednotka, cena)
+SELECT ID_objednavky, Druh, Mnozstvo, Jednotka, Cena FROM material NATURAL JOIN objednavka WHERE Cislo_objednavky = 1;
+
+-- Ktorí zamestnanci kúpili pre firmu vybavenie drahšie ako 10 000 czk (ID, Meno, Priezvisko, cena nákupu)
+SELECT ID_zamestnanca, Meno, Priezvisko, Cena FROM vybavenie NATURAL JOIN zamestnanec WHERE Cena > 10000;
+
+-- Spojenie troch tabuliek --
+-- Ktorí zamestnanci pracujú na objednáckach v meste 'Brno' (ID, Meno, Priezvisko)
+SELECT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN pracuje NATURAL JOIN objednavka WHERE Mesto = 'Brno';
+
+-- Použitie GROUP BY a agregačných funkcií
+-- Aká je celková suma materiálu pre jednotlivé objednávky (Cislo_objednavky, Mesto, Ukoncenie_vystavby, cena materialu)
+SELECT Cislo_objednavky, Mesto, Ukoncenie_vystavby, SUM(Cena) cena_materialu FROM objednavka NATURAL JOIN material GROUP BY Cislo_objednavky, Mesto, Ukoncenie_vystavby;
+
+-- Na koľkých objednávkach pracujú jednotliví zamestnanci (ID, Meno, Priezvisko, počet)
+SELECT ID_zamestnanca, Meno, Priezvisko, COUNT(Cislo_objednavky) pocet_objednavok FROM zamestnanec NATURAL LEFT JOIN pracuje GROUP BY ID_zamestnanca, Meno, Priezvisko;
+
+-- predikát EXIST
+--
+
+
+-- predikát IN
+--
+
+
+-----------------------
+------- mazanie -------
+-----------------------
+
+-- zmazanie tabuliek
+
+DROP TABLE zakaznik CASCADE CONSTRAINTS;
+DROP TABLE pracuje CASCADE CONSTRAINTS;
+DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
+DROP TABLE material CASCADE CONSTRAINTS;
+DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
+DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE vybavenie CASCADE CONSTRAINTS;
+DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE objednavka CASCADE CONSTRAINTS;
+DROP TABLE zamestnanec CASCADE CONSTRAINTS;
+
+-- zmazanie seqvencii
+
+DROP SEQUENCE var_symbol_seq;
+
+
 -- Koniec súboru --

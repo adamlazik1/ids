@@ -384,7 +384,7 @@ SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM vybavenie NATURAL JOIN zam
 SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN pracuje NATURAL JOIN objednavka WHERE Mesto = 'Brno';
 
 -- Použitie GROUP BY a agregačných funkcií
--- Aká je celková suma materiálu pre jednotlivé objednávky (Cislo_objednavky, Mesto, Ukoncenie_vystavby, cena materialu)
+-- Aká je celková cena materiálu pre jednotlivé objednávky (Cislo_objednavky, Mesto, Ukoncenie_vystavby, cena materialu)
 SELECT Cislo_objednavky, Mesto, Ukoncenie_vystavby, SUM(Cena) cena_materialu FROM objednavka NATURAL JOIN material GROUP BY Cislo_objednavky, Mesto, Ukoncenie_vystavby;
 
 -- Na koľkých objednávkach pracujú jednotliví zamestnanci (ID, Meno, Priezvisko, počet)

@@ -373,7 +373,7 @@ VALUES ('Cement', '2', 't', 250, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), 
 -------------------
 
 -- Spojenie dvoch tabuliek
--- Aký materiál je pridelený objednávke číslo '1' (ID objednávky, druh, množstvo, jednotka, cena)
+-- Aký materiál je pridelený objednávke číslo 1 (ID objednávky, druh, množstvo, jednotka, cena)
 SELECT ID_objednavky, Druh, Mnozstvo, Jednotka, Cena FROM material NATURAL JOIN objednavka WHERE Cislo_objednavky = 1;
 
 -- Ktorí zamestnanci kúpili pre firmu vybavenie drahšie ako 10 000 czk (ID, Meno, Priezvisko, cena nákupu)
@@ -390,11 +390,13 @@ SELECT Cislo_objednavky, Mesto, Ukoncenie_vystavby, SUM(Cena) cena_materialu FRO
 -- Na koľkých objednávkach pracujú jednotliví zamestnanci (ID, Meno, Priezvisko, počet)
 SELECT ID_zamestnanca, Meno, Priezvisko, COUNT(Cislo_objednavky) pocet_objednavok FROM zamestnanec NATURAL LEFT JOIN pracuje GROUP BY ID_zamestnanca, Meno, Priezvisko;
 
--- predikát EXIST
---
-
+-- predikát EXISTS
+-- Ktori zamestnanci zatial pracovali aspon na jednej objednavke
+SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec WHERE EXISTS (SELECT ID_zamestnanca FROM pracuje WHERE zamestnanec.ID_zamestnanca = pracuje.ID_zamestnanca);
 
 -- predikát IN
+-- Ktori zamestnanci byvaju v mestach, kde prebiehala praca aspon na jednej objednavke
+SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN vlastny_zamestnanec WHERE Mesto IN (SELECT DISTINCT Mesto FROM objednavka);
 --
 
 
@@ -415,7 +417,7 @@ DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
 DROP TABLE objednavka CASCADE CONSTRAINTS;
 DROP TABLE zamestnanec CASCADE CONSTRAINTS;
 
--- zmazanie seqvencii
+-- zmazanie sekvencii
 
 DROP SEQUENCE var_symbol_seq;
 

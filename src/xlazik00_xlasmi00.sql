@@ -381,7 +381,7 @@ SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM vybavenie NATURAL JOIN zam
 
 -- Spojenie troch tabuliek --
 -- Ktorí zamestnanci pracujú na objednáckach v meste 'Brno' (ID, Meno, Priezvisko)
-SELECT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN pracuje NATURAL JOIN objednavka WHERE Mesto = 'Brno';
+SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN pracuje NATURAL JOIN objednavka WHERE Mesto = 'Brno';
 
 -- Použitie GROUP BY a agregačných funkcií
 -- Aká je celková suma materiálu pre jednotlivé objednávky (Cislo_objednavky, Mesto, Ukoncenie_vystavby, cena materialu)

@@ -290,16 +290,16 @@ CREATE TABLE material (
 -------------------
 
 INSERT INTO zakaznik(Priezvisko, Meno, Titul, Tel, Email, Ulica, Mesto, PSC)
-VALUES ('Kopernik', 'Mikulas', 'Ing.', '+421 906 452 987', 'kopernik@mail.com', 'Bozechtova', 'Brno', '05247');
+VALUES ('Kopernik', 'Mikuláš', 'Ing.', '+421 906 452 987', 'kopernik@mail.com', 'Božetěchova', 'Brno', '60200');
 
 INSERT INTO objednavka(Ulica, Mesto, PSC, Zaciatok_vystavby, Ukoncenie_vystavby, Popis, Status, Posledna_uprava, Specifikacia, ID_zakaznik)
-VALUES ('Metodejova', 'Brno', '06484', TO_DATE('2023-07-30', 'yyyy/mm/dd'), NULL, 'Stavba rodinného domu', 'Nezačatá', NULL, '/home/objednavky/1/spec.pdf', 1);
+VALUES ('Metodejova', 'Brno', '60200', TO_DATE('2023-07-30', 'yyyy/mm/dd'), NULL, 'Stavba rodinného domu', 'Nezačatá', NULL, '/home/objednavky/1/spec.pdf', 1);
 
 INSERT INTO objednavka(Ulica, Mesto, PSC, Zaciatok_vystavby, Ukoncenie_vystavby, Popis, Status, Posledna_uprava, Specifikacia, ID_zakaznik)
-VALUES ('Karlova', 'Praha', '05548', TO_DATE('2019-03-15', 'yyyy/mm/dd'), NULL, 'Stavba parku', 'Začatá', NULL, '/home/objednavky/2/spec.pdf', 1);
+VALUES ('Karlova', 'Praha', '60200', TO_DATE('2019-03-15', 'yyyy/mm/dd'), NULL, 'Stavba parku', 'Začatá', NULL, '/home/objednavky/2/spec.pdf', 1);
 
 INSERT INTO objednavka(Ulica, Mesto, PSC, Zaciatok_vystavby, Ukoncenie_vystavby, Popis, Status, Posledna_uprava, Specifikacia, ID_zakaznik)
-VALUES ('Křenova', 'Brno', '06484', TO_DATE('2014-04-03', 'yyyy/mm/dd'), TO_DATE('2017-09-04', 'yyyy/mm/dd'), 'Prerábky strechy', 'Skončená', NULL, '/home/objednavky/3/spec.pdf', 1);
+VALUES ('Křenova', 'Brno', '60200', TO_DATE('2014-04-03', 'yyyy/mm/dd'), TO_DATE('2017-09-04', 'yyyy/mm/dd'), 'Prerábanie strechy', 'Skončená', NULL, '/home/objednavky/3/spec.pdf', 1);
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Newton', 'Isac', 'Ing.', 'Statik', '+421907442954', 'newton@mail.com', '0000111333/2700');
@@ -309,7 +309,7 @@ VALUES ('25596641', 'CZ25596641', 'Stavmont', '1');
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Tesla', 'Nicola', 'Ing.', 'Elektrika', '775442954', 'tesla@mail.com', '86-0199488014/0300');
 INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Platena_dovolenka_dni, Neplatena_dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 200, 'Plny', 30, 45, 'Ceska', 'Brno', '02354', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
+VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 200, 'Plný', 30, 45, 'Česká', 'Brno', '60200', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Einstein', 'Albert', 'Ing.', 'Statik', '595242654', 'einstein@mail.com', '86-0199488014/0300');
@@ -319,7 +319,7 @@ VALUES ('1265421369', TO_DATE('1988-05-14', 'yyyy/mm/dd'), 250, 'Plny', 30, 45, 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Curie', 'Marie', 'Ing.', 'Referentka', '591232654', 'curie@mail.com', '86-0199488014/0300');
 INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Platena_dovolenka_dni, Neplatena_dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1985-11-17', 'yyyy/mm/dd'), 180, 'Plny', 30, 45, 'Berkova', 'Brno', '06484', 'HK125987', TO_DATE('2001-06-07', 'yyyy/mm/dd'), NULL, 3, 4);
+VALUES ('1265421369', TO_DATE('1985-11-17', 'yyyy/mm/dd'), 180, 'Plný', 30, 45, 'Berkova', 'Brno', '06484', 'HK125987', TO_DATE('2001-06-07', 'yyyy/mm/dd'), NULL, 3, 4);
 
 INSERT INTO povereny_pracovnik(ID_zamestnanca)
 VALUES (2);
@@ -328,13 +328,13 @@ INSERT INTO povereny_pracovnik(ID_zamestnanca)
 VALUES (3);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
-VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyveduci', 1, 2);
+VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyvedúci', 1, 2);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
-VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyveduci', 2, 2);
+VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyvedúci', 2, 2);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
-VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyveduci', 3, 3);
+VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyvedúci', 3, 3);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
 VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Referent', 1, 4);
@@ -345,28 +345,28 @@ INSERT INTO vyplatna_listina(Datum, Odrobenych_hod, Mzda, Platena_dovolenka, Nep
 VALUES (TO_DATE('1972-07', 'yyyy/mm'), NULL, NULL, NULL, NULL, NULL, 2);
 
 INSERT INTO vybavenie(Druh, Cena, Stav, Datum_nakupu, Nakupna_zmluva, ID_zamestnanca)
-VALUES ('Bager', '6000000', 'Novy', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '2');
+VALUES ('Bager', '6000000', 'Nový', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '2');
 
 INSERT INTO vybavenie(Druh, Cena, Stav, Datum_nakupu, Nakupna_zmluva, ID_zamestnanca)
-VALUES ('Bager', '5500000', 'Novy', TO_DATE('2000-07-30', 'yyyy/mm/dd'), 'tu', '2');
+VALUES ('Bager', '5500000', 'Nový', TO_DATE('2000-07-30', 'yyyy/mm/dd'), 'tu', '2');
 
 INSERT INTO vybavenie(Druh, Cena, Stav, Datum_nakupu, Nakupna_zmluva, ID_zamestnanca)
-VALUES ('Zbíjačka', '5000', 'Novy', TO_DATE('2001-07-30', 'yyyy/mm/dd'), 'tu', '3');
+VALUES ('Zbíjačka', '5000', 'Nový', TO_DATE('2001-07-30', 'yyyy/mm/dd'), 'tu', '3');
 
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
 VALUES ('Tehly', '20', 't', 22000, 'BOUMIT', TO_DATE('1972-07-30', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343242.pdf', '1', '2');
 
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
-VALUES ('Tehly', '25', 't', 22500, 'BOUMIT', TO_DATE('2021-09-06', 'yyyy/mm/dd'), '/home/objednavky/2/materialy/tehly_boumit/2343242.pdf', '2', '2');
+VALUES ('Tehly', '25', 't', 22500, 'BOUMIT', TO_DATE('2021-09-06', 'yyyy/mm/dd'), '/home/objednavky/2/materialy/tehly_boumit/2343243.pdf', '2', '2');
 
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
-VALUES ('Okná', '24', 'ks', 1000, 'GlasMont', TO_DATE('2022-08-22', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/okna/2343242.pdf', '1', '2');
+VALUES ('Okná', '24', 'ks', 1000, 'GlasMont', TO_DATE('2022-08-22', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/okna/2343244.pdf', '1', '2');
 
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
-VALUES ('Tehly', '5', 't', 500, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343242.pdf', '3', '3');
+VALUES ('Tehly', '5', 't', 500, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/tehly_boumit/2343245.pdf', '3', '3');
 
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
-VALUES ('Cement', '2', 't', 250, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/cement/2343242.pdf', '3', '3');
+VALUES ('Cement', '2', 't', 250, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/cement/2343246.pdf', '3', '3');
 
 -------------------
 ----- Selekty -----
@@ -391,11 +391,11 @@ SELECT Cislo_objednavky, Mesto, Ukoncenie_vystavby, SUM(Cena) cena_materialu FRO
 SELECT ID_zamestnanca, Meno, Priezvisko, COUNT(Cislo_objednavky) pocet_objednavok FROM zamestnanec NATURAL LEFT JOIN pracuje GROUP BY ID_zamestnanca, Meno, Priezvisko;
 
 -- predikát EXISTS
--- Ktori zamestnanci zatial pracovali aspon na jednej objednavke
+-- Ktorí zamestnanci pracovali aspoň na jednej objednávke
 SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec WHERE EXISTS (SELECT ID_zamestnanca FROM pracuje WHERE zamestnanec.ID_zamestnanca = pracuje.ID_zamestnanca);
 
 -- predikát IN
--- Ktori zamestnanci byvaju v mestach, kde prebiehala praca aspon na jednej objednavke
+-- Ktorí zamestnanci bývaju v mestách, kde prebiehala práca aspoň na jednej objednávke
 SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN vlastny_zamestnanec WHERE Mesto IN (SELECT DISTINCT Mesto FROM objednavka);
 --
 
@@ -417,7 +417,7 @@ DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
 DROP TABLE objednavka CASCADE CONSTRAINTS;
 DROP TABLE zamestnanec CASCADE CONSTRAINTS;
 
--- zmazanie sekvencii
+-- zmazanie sekvencií
 
 DROP SEQUENCE var_symbol_seq;
 

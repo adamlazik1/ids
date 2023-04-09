@@ -397,29 +397,6 @@ SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec WHERE EXISTS (
 -- predikát IN
 -- Ktorí zamestnanci bývaju v mestách, kde prebiehala práca aspoň na jednej objednávke
 SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN vlastny_zamestnanec WHERE Mesto IN (SELECT DISTINCT Mesto FROM objednavka);
---
-
-
------------------------
-------- mazanie -------
------------------------
-
--- zmazanie tabuliek
-
-DROP TABLE zakaznik CASCADE CONSTRAINTS;
-DROP TABLE pracuje CASCADE CONSTRAINTS;
-DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
-DROP TABLE material CASCADE CONSTRAINTS;
-DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
-DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
-DROP TABLE vybavenie CASCADE CONSTRAINTS;
-DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
-DROP TABLE objednavka CASCADE CONSTRAINTS;
-DROP TABLE zamestnanec CASCADE CONSTRAINTS;
-
--- zmazanie sekvencií
-
-DROP SEQUENCE var_symbol_seq;
 
 
 -- Koniec súboru --

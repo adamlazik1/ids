@@ -285,6 +285,28 @@ CREATE TABLE material (
     ON DELETE CASCADE
 );
 
+
+-------------------
+----- Triggery ----
+-------------------
+
+-- V prípade ak ja upravený dátum kolaudácie na iný než NULL (teda je zadaný dátum kolaudáciu), tak pre všetky polia v tabuľke 'pracuje' pre danú zakázku nastav 'Datum_do' na daný dátum kolaudácie
+CREATE OR REPLACE TRIGGER update_datum_prace
+AFTER UPDATE OF Ukoncenie_vystavby ON objednavka
+FOR EACH ROW
+BEGIN
+  IF :new.Ukoncenie_vystavby IS NOT NULL THEN
+    UPDATE pracuje
+    SET Datum_do =: new.Ukoncenie_vystavby
+    WHERE Cislo_objednavky =: new.Cislo_objednavky
+    AND Datum_do IS NULL;
+  END IF;
+END;
+/
+
+-- TODO 1x trigger
+
+
 -------------------
 -- Ukážkové dáta --
 -------------------
@@ -307,19 +329,19 @@ INSERT INTO externy_zamestnanec(ICO, DIC, Nazov_firmy, ID_zamestnanca)
 VALUES ('25596641', 'CZ25596641', 'Stavmont', '1');
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
-VALUES ('Tesla', 'Nicola', 'Ing.', 'Elektrika', '775442954', 'tesla@mail.com', '86-0199488014/0300');
+VALUES ('Tesla', 'Nicola', 'Ing.', 'Statik', '775442954', 'tesla@mail.com', '86-0199488014/0300');
 INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Platena_dovolenka_dni, Neplatena_dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 200, 'Plný', 30, 45, 'Česká', 'Brno', '60200', 'HK123654', TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
+VALUES ('1265421369', TO_DATE('1951-07-30', 'yyyy/mm/dd'), 200, 'Plný', 30, 45, 'Česká', 'Brno', '60200', 'HK123654', TO_DATE('1969-07-30', 'yyyy/mm/dd'), NULL, NULL, 2);
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Einstein', 'Albert', 'Ing.', 'Statik', '595242654', 'einstein@mail.com', '86-0199488014/0300');
 INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Platena_dovolenka_dni, Neplatena_dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1988-05-14', 'yyyy/mm/dd'), 250, 'Plny', 30, 45, 'Mendelova', 'Brno', '06484', 'HK123987', TO_DATE('2000-02-09', 'yyyy/mm/dd'), NULL, NULL, 3);
+VALUES ('1265421369', TO_DATE('1950-05-14', 'yyyy/mm/dd'), 250, 'Plny', 30, 45, 'Mendelova', 'Brno', '06484', 'HK123987', TO_DATE('1970-02-09', 'yyyy/mm/dd'), NULL, NULL, 3);
 
 INSERT INTO zamestnanec(Priezvisko, Meno, Titul, Specializacia, Tel, Email, Cislo_uctu)
 VALUES ('Curie', 'Marie', 'Ing.', 'Referentka', '591232654', 'curie@mail.com', '86-0199488014/0300');
 INSERT INTO vlastny_zamestnanec(Cislo_zdravotneho_preukazu, Datum_narodenia, Plat_hod, Uvazok, Platena_dovolenka_dni, Neplatena_dovolenka_dni, Ulica, Mesto, PSC, Cislo_OP, Datum_nastupu, Datum_ukoncenia, nadriadeny, ID_zamestnanca)
-VALUES ('1265421369', TO_DATE('1985-11-17', 'yyyy/mm/dd'), 180, 'Plný', 30, 45, 'Berkova', 'Brno', '06484', 'HK125987', TO_DATE('2001-06-07', 'yyyy/mm/dd'), NULL, 3, 4);
+VALUES ('1265421369', TO_DATE('1960-11-17', 'yyyy/mm/dd'), 180, 'Plný', 30, 45, 'Berkova', 'Brno', '06484', 'HK125987', TO_DATE('1977-06-07', 'yyyy/mm/dd'), NULL, 3, 4);
 
 INSERT INTO povereny_pracovnik(ID_zamestnanca)
 VALUES (2);
@@ -328,7 +350,7 @@ INSERT INTO povereny_pracovnik(ID_zamestnanca)
 VALUES (3);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
-VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyvedúci', 1, 2);
+VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), TO_DATE('1988-03-04', 'yyyy/mm/dd'), 'Stavbyvedúci', 1, 2);
 
 INSERT INTO pracuje(Datum_od, Datum_do, Druh_prace, Cislo_objednavky, ID_zamestnanca)
 VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Stavbyvedúci', 2, 2);
@@ -343,6 +365,12 @@ VALUES (TO_DATE('1972-07-30', 'yyyy/mm/dd'), NULL, 'Referent', 1, 4);
 -- Tie sa zadávajú a upravujú priebežne počas mesiaca
 INSERT INTO vyplatna_listina(Datum, Odrobenych_hod, Mzda, Platena_dovolenka, Neplatena_dovolenka, Financne_odmeny, ID_zamestnanca)
 VALUES (TO_DATE('1972-07', 'yyyy/mm'), NULL, NULL, NULL, NULL, NULL, 2);
+
+INSERT INTO vyplatna_listina(Datum, Odrobenych_hod, Mzda, Platena_dovolenka, Neplatena_dovolenka, Financne_odmeny, ID_zamestnanca)
+VALUES (TO_DATE('1972-08', 'yyyy/mm'), 90, 24000, 0, 10, 0, 1);
+
+INSERT INTO vyplatna_listina(Datum, Odrobenych_hod, Mzda, Platena_dovolenka, Neplatena_dovolenka, Financne_odmeny, ID_zamestnanca)
+VALUES (TO_DATE('1972-09', 'yyyy/mm'), 120, 36000, 1, 3, 0, 3);
 
 INSERT INTO vybavenie(Druh, Cena, Stav, Datum_nakupu, Nakupna_zmluva, ID_zamestnanca)
 VALUES ('Bager', '6000000', 'Nový', TO_DATE('1972-07-30', 'yyyy/mm/dd'), 'tu', '2');
@@ -368,35 +396,182 @@ VALUES ('Tehly', '5', 't', 500, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), '
 INSERT INTO material(Druh, Mnozstvo, Jednotka, Cena, Dodavatel, Datum, Nakupna_zmluva, Cislo_objednavky, ID_zamestnanca)
 VALUES ('Cement', '2', 't', 250, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), '/home/objednavky/1/materialy/cement/2343246.pdf', '3', '3');
 
--------------------
------ Selekty -----
--------------------
 
--- Spojenie dvoch tabuliek
--- Aký materiál je pridelený objednávke číslo 1 (ID objednávky, druh, množstvo, jednotka, cena)
-SELECT ID_objednavky, Druh, Mnozstvo, Jednotka, Cena FROM material NATURAL JOIN objednavka WHERE Cislo_objednavky = 1;
 
--- Ktorí zamestnanci kúpili pre firmu vybavenie drahšie ako 10 000 czk (ID, Meno, Priezvisko, cena nákupu)
-SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM vybavenie NATURAL JOIN zamestnanec WHERE Cena > 10000;
+---------------------------
+----- Priklad trigger -----
+---------------------------
 
--- Spojenie troch tabuliek --
--- Ktorí zamestnanci pracujú na objednáckach v meste 'Brno' (ID, Meno, Priezvisko)
-SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN pracuje NATURAL JOIN objednavka WHERE Mesto = 'Brno';
+-- selekt na overenie
+SELECT * FROM pracuje;
 
--- Použitie GROUP BY a agregačných funkcií
--- Aká je celková cena materiálu pre jednotlivé objednávky (Cislo_objednavky, Mesto, Ukoncenie_vystavby, cena materialu)
-SELECT Cislo_objednavky, Mesto, Ukoncenie_vystavby, SUM(Cena) cena_materialu FROM objednavka NATURAL JOIN material GROUP BY Cislo_objednavky, Mesto, Ukoncenie_vystavby;
+-- tento príkaz by mal vyvolať trigger a zmeniť atribút 'Datum_do', pri pracujúcich na konkrétnej objednávke, ktorí mali 'Datum_do' = NULL na dátum ukončenia čiže 2023-04-20
+UPDATE objednavka
+SET Ukoncenie_vystavby = TO_DATE('2023-04-20', 'yyyy/mm/dd')
+WHERE Cislo_objednavky = 1;
 
--- Na koľkých objednávkach pracujú jednotliví zamestnanci (ID, Meno, Priezvisko, počet)
-SELECT ID_zamestnanca, Meno, Priezvisko, COUNT(Cislo_objednavky) pocet_objednavok FROM zamestnanec NATURAL LEFT JOIN pracuje GROUP BY ID_zamestnanca, Meno, Priezvisko;
 
--- predikát EXISTS
--- Ktorí zamestnanci pracovali aspoň na jednej objednávke
-SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec WHERE EXISTS (SELECT ID_zamestnanca FROM pracuje WHERE zamestnanec.ID_zamestnanca = pracuje.ID_zamestnanca);
 
--- predikát IN
--- Ktorí zamestnanci bývaju v mestách, kde prebiehala práca aspoň na jednej objednávke
-SELECT DISTINCT ID_zamestnanca, Meno, Priezvisko FROM zamestnanec NATURAL JOIN vlastny_zamestnanec WHERE Mesto IN (SELECT DISTINCT Mesto FROM objednavka);
+-- TODO 1x príklad triggeru
 
+
+---------------------
+----- Procedúry -----
+---------------------
+
+-- Procedúra vypočíta priemernú mzdu, platenú dovolenku, neplatenú dovolenku a odmeny za zadaný časový údaj 'od'-'do'
+
+CREATE OR REPLACE PROCEDURE avg_vyplatna_listina(d_od IN DATE, d_do IN DATE)
+AS
+    avg_mzda NUMBER;
+    avg_pl_dovolenka NUMBER;
+    avg_npl_dovolenka NUMBER;
+    avg_odmeny NUMBER;
+    num_mzda NUMBER := 0;
+    num_pl_dovolenka NUMBER := 0;
+    num_npl_dovolenka NUMBER := 0;
+    num_odmeny NUMBER := 0;
+    num_zamestnanci NUMBER;
+    CURSOR cursor_vyplatna_listina IS SELECT * FROM vyplatna_listina WHERE Datum BETWEEN d_od AND d_do;
+    riadok_vyplatna_listina vyplatna_listina%ROWTYPE;
+BEGIN
+    
+    OPEN cursor_vyplatna_listina;
+    
+    LOOP
+        FETCH cursor_vyplatna_listina INTO riadok_vyplatna_listina;
+        EXIT WHEN cursor_vyplatna_listina%NOTFOUND;
+        
+        IF riadok_vyplatna_listina.Mzda IS NOT NULL THEN
+        num_mzda := num_mzda + riadok_vyplatna_listina.Mzda;
+        END IF;
+        
+        IF riadok_vyplatna_listina.Platena_dovolenka IS NOT NULL THEN
+        num_pl_dovolenka := num_pl_dovolenka + riadok_vyplatna_listina.Platena_dovolenka;
+        END IF;
+        
+        IF riadok_vyplatna_listina.Neplatena_dovolenka IS NOT NULL THEN
+        num_npl_dovolenka := num_npl_dovolenka + riadok_vyplatna_listina.Neplatena_dovolenka;
+        END IF;
+        
+        IF riadok_vyplatna_listina.Financne_odmeny IS NOT NULL THEN
+        num_odmeny := num_odmeny + riadok_vyplatna_listina.Financne_odmeny;
+        END IF;
+        
+    END LOOP;
+
+    CLOSE cursor_vyplatna_listina;
+
+    SELECT COUNT(*) INTO num_zamestnanci FROM vlastny_zamestnanec WHERE Datum_nastupu <= d_od;
+    
+    -- výpočet priemerných hodnôt
+    avg_mzda := num_mzda / num_zamestnanci;
+    avg_pl_dovolenka := num_pl_dovolenka / num_zamestnanci;
+    avg_npl_dovolenka := num_npl_dovolenka / num_zamestnanci;
+    avg_odmeny := num_odmeny / num_zamestnanci;
+    
+    -- Výpis
+    DBMS_OUTPUT.put_line
+    (
+       'V zadanom období bola celková vyplatená mzda '
+        || num_mzda || '; celková hodnota vyplatených odmien '
+        || num_odmeny || '; celkový počet zamestnancov '
+        || num_zamestnanci || '.'
+    );
+    
+    DBMS_OUTPUT.put_line(
+		'Priemerná mzda za dané obdobie bola  '
+		|| avg_mzda || '; priemerná doba neplatenej dovolenky na jedného zamestnanca bola '
+		|| avg_pl_dovolenka || '; priemerná doba platenej dovolenky na jedného zamestnanca '
+		|| avg_npl_dovolenka || '; priemerné odmeny vyplatené na jedného zamestnanca '
+        || avg_odmeny || '.'
+	);
+    
+    EXCEPTION WHEN ZERO_DIVIDE THEN
+	BEGIN
+		IF num_zamestnanci = 0 THEN
+			DBMS_OUTPUT.put_line('V danom období neboli zamestnaní žiadni zamestnanci.');
+		END IF;
+	END;
+END;
+/
+
+
+-- Príklad spustenia
+SET SERVEROUTPUT ON;
+EXECUTE avg_vyplatna_listina(DATE '1971-07-05', DATE '1973-07-05');
+
+
+-- (Idea) Procedúra vypočíta ročné prijímy a výdaje za zadaný rok. Teda procedúra spočíta ceny objednávok a odčíta od nich náklady na platy zamestnancov, ceny materiálu a zakúpeného vybavenia
+-- (Idea) Procedúra spočíta celkové náklady za zadaný rok (platy zamestnancov + cevu zakúpeného vybavenia)
+
+-- TODO
+
+
+------------------------
+----- EXPLAIN PLAN -----
+------------------------
+
+-- Ktorí zamestnanci majú špecializáciu 'Statik' a pracovali na viac ako jednej objednávke + koľko ich je
+
+EXPLAIN PLAN FOR
+SELECT Priezvisko, Meno, Titul, COUNT(*) FROM pracuje NATURAL JOIN zamestnanec WHERE Specializacia = 'Statik' GROUP BY Priezvisko, Meno, Titul HAVING COUNT(*) > 1;
+
+
+-- INDEX 
+CREATE INDEX zamestnanec_spec ON zamestnanec (Specializacia);
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+
+
+
+-----------------------------
+----- MATERIALIZED VIEW -----
+-----------------------------
+
+
+-- TODO select
+-- TODO použitie
+-- TODO update
+
+
+----------------------------
+----- Prístupové práva -----
+----------------------------
+
+
+-- TODO
+
+
+----------------------------
+--------- Selekty ----------
+----------------------------
+
+-- TODO selekt s WITH a CASE
+
+
+
+-----------------------
+------- mazanie -------
+-----------------------
+
+-- zmazanie tabuliek
+
+DROP TABLE zakaznik CASCADE CONSTRAINTS;
+DROP TABLE pracuje CASCADE CONSTRAINTS;
+DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
+DROP TABLE material CASCADE CONSTRAINTS;
+DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
+DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE vybavenie CASCADE CONSTRAINTS;
+DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE objednavka CASCADE CONSTRAINTS;
+DROP TABLE zamestnanec CASCADE CONSTRAINTS;
+
+-- zmazanie sekvencií
+
+DROP SEQUENCE var_symbol_seq;
+DROP INDEX zamestnanec_spec; 
 
 -- Koniec súboru --

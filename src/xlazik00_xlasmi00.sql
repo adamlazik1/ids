@@ -26,7 +26,6 @@ DROP TABLE zamestnanec CASCADE CONSTRAINTS;
 -- zmazanie sekvencií
 
 DROP SEQUENCE var_symbol_seq;
-DROP INDEX zamestnanec_spec;
 
 DROP MATERIALIZED VIEW aktualne_prace;
 
@@ -577,6 +576,13 @@ SELECT Priezvisko, Meno, Titul, COUNT(*) FROM pracuje NATURAL JOIN zamestnanec W
 
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
+----------------------------
+----- Prístupové práva -----
+----------------------------
+
+
+GRANT ALL PRIVILEGES ON  pracuje TO xlasmi00;
+GRANT ALL PRIVILEGES ON  zamestnanec TO xlasmi00;
 
 -----------------------------
 ----- MATERIALIZED VIEW -----
@@ -586,24 +592,14 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 CREATE MATERIALIZED VIEW aktualne_prace
 BUILD IMMEDIATE
 AS
-SELECT Id_Zamestnanca, Priezvisko, Meno, Cislo_Objednavky, Datum_od FROM zamestnanec NATURAL JOIN pracuje
+SELECT Id_Zamestnanca, Priezvisko, Meno, Cislo_Objednavky, Datum_od FROM xlazik00.zamestnanec NATURAL JOIN xlazik00.pracuje
 WHERE Datum_do IS NULL OR Datum_do > TRUNC(SYSDATE);
 
-ALTER MATERIALIZED VIEW aktualne_prace OWNER TO xlasmi00;
 
 SELECT * FROM aktualne_prace;
 -- TODO select
 -- TODO použitie
 -- TODO update
-
-
-----------------------------
------ Prístupové práva -----
-----------------------------
-
-
-GRANT ALL PRIVILEGES ON aktualne_prace TO xlasmi00;
-
 
 ----------------------------
 --------- Selekty ----------

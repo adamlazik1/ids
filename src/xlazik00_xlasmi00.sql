@@ -28,6 +28,8 @@ DROP TABLE zamestnanec CASCADE CONSTRAINTS;
 DROP SEQUENCE var_symbol_seq;
 DROP INDEX zamestnanec_spec;
 
+DROP MATERIALIZED VIEW aktualne_prace;
+
 ---------------------------------------------
 ------- Definície overovacích funkcií -------
 ---------------------------------------------
@@ -444,7 +446,7 @@ SET Ukoncenie_vystavby = TO_DATE('2023-04-20', 'yyyy/mm/dd')
 WHERE Cislo_objednavky = 1;
 
 UPDATE vlastny_zamestnanec
-SET Datum_ukoncenia = TO_DATE('2023-03-20', 'YYYY-MM-DD')
+SET Datum_ukoncenia = TO_DATE('2023-06-20', 'YYYY-MM-DD')
 WHERE ID_zamestnanca = 3;
 
 -- selekt po prevedeni zmien
@@ -565,20 +567,31 @@ EXECUTE rocne_vydaje_total('1972');
 EXPLAIN PLAN FOR
 SELECT Priezvisko, Meno, Titul, COUNT(*) FROM pracuje NATURAL JOIN zamestnanec WHERE Specializacia = 'Statik' GROUP BY Priezvisko, Meno, Titul HAVING COUNT(*) > 1;
 
-
 -- INDEX
 CREATE INDEX zamestnanec_spec ON zamestnanec (Specializacia);
 
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
+EXPLAIN PLAN FOR
+SELECT Priezvisko, Meno, Titul, COUNT(*) FROM pracuje NATURAL JOIN zamestnanec WHERE Specializacia = 'Statik' GROUP BY Priezvisko, Meno, Titul HAVING COUNT(*) > 1;
 
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
 
 -----------------------------
 ----- MATERIALIZED VIEW -----
 -----------------------------
 
+-- Vyber vsetc
+CREATE MATERIALIZED VIEW aktualne_prace
+BUILD IMMEDIATE
+AS
+SELECT Id_Zamestnanca, Priezvisko, Meno, Cislo_Objednavky, Datum_od FROM zamestnanec NATURAL JOIN pracuje
+WHERE Datum_do IS NULL OR Datum_do > TRUNC(SYSDATE);
 
+ALTER MATERIALIZED VIEW aktualne_prace OWNER TO xlasmi00;
+
+SELECT * FROM aktualne_prace;
 -- TODO select
 -- TODO použitie
 -- TODO update
@@ -589,15 +602,15 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 ----------------------------
 
 
--- TODO
+GRANT ALL PRIVILEGES ON aktualne_prace TO xlasmi00;
 
 
 ----------------------------
 --------- Selekty ----------
 ----------------------------
 
--- Selekt roztriedi objednavky materialu, ktore sa meraju v tonach, do skuupin podla objednanej vahy
-WITH objednavky_materialu AS (SELECT Id_Objednavky, Druh, Mnozstvo, Dodavatel FROM material NATURAL JOIN objednavka WHERE Jednotka = 't') SELECT
+-- Selekt roztriedi objednavky materialu, ktore sa meraju v tonach, do skupin podla objednanej vahy
+WITH objednavky_materialu AS (SELECT Id_Objednavky, Druh, Dodavatel, Cena, Mnozstvo, Dodavatel FROM material NATURAL JOIN objednavka WHERE Jednotka = 't') SELECT
 Id_Objednavky,
 Druh,
 CASE

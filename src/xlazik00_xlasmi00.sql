@@ -4,6 +4,30 @@
 * Dátum: 26.03.2023
 */
 
+
+
+-----------------------
+------- mazanie -------
+-----------------------
+
+-- zmazanie tabuliek
+
+DROP TABLE zakaznik CASCADE CONSTRAINTS;
+DROP TABLE pracuje CASCADE CONSTRAINTS;
+DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
+DROP TABLE material CASCADE CONSTRAINTS;
+DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
+DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE vybavenie CASCADE CONSTRAINTS;
+DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
+DROP TABLE objednavka CASCADE CONSTRAINTS;
+DROP TABLE zamestnanec CASCADE CONSTRAINTS;
+
+-- zmazanie sekvencií
+
+DROP SEQUENCE var_symbol_seq;
+DROP INDEX zamestnanec_spec;
+
 ---------------------------------------------
 ------- Definície overovacích funkcií -------
 ---------------------------------------------
@@ -304,8 +328,17 @@ BEGIN
 END;
 /
 
--- TODO 1x trigger
-
+-- V pripade, ze je znamy datum ukoncenia pracovneho pomeru zamestnanca, nastavi sa tento datum ako datum ukoncenia jeho prace na objednavke, na ktorej prave pracuje
+-- (a na ktorej datum jeho ukoncenia nebol pred touto udalostou znamy)
+CREATE OR REPLACE TRIGGER update_ukoncenie_zamestnania
+AFTER UPDATE OF Datum_ukoncenia ON vlastny_zamestnanec
+FOR EACH ROW
+BEGIN
+    UPDATE pracuje
+    SET Datum_do =: new.Datum_ukoncenia
+    WHERE ID_Zamestnanca =: new.ID_Zamestnanca AND Datum_do IS NULL;
+END;
+/
 
 -------------------
 -- Ukážkové dáta --
@@ -410,10 +443,12 @@ UPDATE objednavka
 SET Ukoncenie_vystavby = TO_DATE('2023-04-20', 'yyyy/mm/dd')
 WHERE Cislo_objednavky = 1;
 
+UPDATE vlastny_zamestnanec
+SET Datum_ukoncenia = TO_DATE('2023-03-20', 'YYYY-MM-DD')
+WHERE ID_zamestnanca = 3;
 
-
--- TODO 1x príklad triggeru
-
+-- selekt po prevedeni zmien
+SELECT * FROM pracuje;
 
 ---------------------
 ----- Procedúry -----
@@ -435,41 +470,41 @@ AS
     CURSOR cursor_vyplatna_listina IS SELECT * FROM vyplatna_listina WHERE Datum BETWEEN d_od AND d_do;
     riadok_vyplatna_listina vyplatna_listina%ROWTYPE;
 BEGIN
-    
+
     OPEN cursor_vyplatna_listina;
-    
+
     LOOP
         FETCH cursor_vyplatna_listina INTO riadok_vyplatna_listina;
         EXIT WHEN cursor_vyplatna_listina%NOTFOUND;
-        
+
         IF riadok_vyplatna_listina.Mzda IS NOT NULL THEN
         num_mzda := num_mzda + riadok_vyplatna_listina.Mzda;
         END IF;
-        
+
         IF riadok_vyplatna_listina.Platena_dovolenka IS NOT NULL THEN
         num_pl_dovolenka := num_pl_dovolenka + riadok_vyplatna_listina.Platena_dovolenka;
         END IF;
-        
+
         IF riadok_vyplatna_listina.Neplatena_dovolenka IS NOT NULL THEN
         num_npl_dovolenka := num_npl_dovolenka + riadok_vyplatna_listina.Neplatena_dovolenka;
         END IF;
-        
+
         IF riadok_vyplatna_listina.Financne_odmeny IS NOT NULL THEN
         num_odmeny := num_odmeny + riadok_vyplatna_listina.Financne_odmeny;
         END IF;
-        
+
     END LOOP;
 
     CLOSE cursor_vyplatna_listina;
 
     SELECT COUNT(*) INTO num_zamestnanci FROM vlastny_zamestnanec WHERE Datum_nastupu <= d_od;
-    
+
     -- výpočet priemerných hodnôt
     avg_mzda := num_mzda / num_zamestnanci;
     avg_pl_dovolenka := num_pl_dovolenka / num_zamestnanci;
     avg_npl_dovolenka := num_npl_dovolenka / num_zamestnanci;
     avg_odmeny := num_odmeny / num_zamestnanci;
-    
+
     -- Výpis
     DBMS_OUTPUT.put_line
     (
@@ -478,7 +513,7 @@ BEGIN
         || num_odmeny || '; celkový počet zamestnancov '
         || num_zamestnanci || '.'
     );
-    
+
     DBMS_OUTPUT.put_line(
 		'Priemerná mzda za dané obdobie bola  '
 		|| avg_mzda || '; priemerná doba neplatenej dovolenky na jedného zamestnanca bola '
@@ -486,7 +521,7 @@ BEGIN
 		|| avg_npl_dovolenka || '; priemerné odmeny vyplatené na jedného zamestnanca '
         || avg_odmeny || '.'
 	);
-    
+
     EXCEPTION WHEN ZERO_DIVIDE THEN
 	BEGIN
 		IF num_zamestnanci = 0 THEN
@@ -496,17 +531,30 @@ BEGIN
 END;
 /
 
+-- Procedúra spočíta celkové náklady za zadaný rok (platy zamestnancov + financne odmeny + cenu zakúpeného vybavenia + cenu zakupeneho materialu)
+CREATE OR REPLACE PROCEDURE rocne_vydaje_total(rok IN VARCHAR2)
+AS
+    suma_vl NUMBER := 0;
+    suma_vb NUMBER := 0;
+    suma_m NUMBER := 0;
+    suma_total NUMBER := 0;
+BEGIN
+    SELECT NVL(SUM(Mzda + Financne_odmeny), 0) INTO suma_vl FROM vyplatna_listina WHERE TO_CHAR(Datum, 'YYYY') = rok;
+    SELECT NVL(SUM(Cena), 0) INTO suma_vb FROM vybavenie WHERE TO_CHAR(Datum_nakupu, 'YYYY') = rok;
+    SELECT NVL(SUM(Cena), 0) INTO suma_m FROM material WHERE  TO_CHAR(Datum, 'YYYY') = rok;
+    suma_total := suma_vl + suma_vb + suma_m;
 
+    DBMS_OUTPUT.put_line('Totalne vydaje za rok ' || rok || ':');
+    DBMS_OUTPUT.put_line('Vyplatne listiny: ' || suma_vl);
+    DBMS_OUTPUT.put_line('Material: ' || suma_m);
+    DBMS_OUTPUT.put_line('Vybavenie: ' || suma_vb);
+    DBMS_OUTPUT.put_line('Celkovo: ' || suma_total);
+END;
+/
 -- Príklad spustenia
 SET SERVEROUTPUT ON;
 EXECUTE avg_vyplatna_listina(DATE '1971-07-05', DATE '1973-07-05');
-
-
--- (Idea) Procedúra vypočíta ročné prijímy a výdaje za zadaný rok. Teda procedúra spočíta ceny objednávok a odčíta od nich náklady na platy zamestnancov, ceny materiálu a zakúpeného vybavenia
--- (Idea) Procedúra spočíta celkové náklady za zadaný rok (platy zamestnancov + cevu zakúpeného vybavenia)
-
--- TODO
-
+EXECUTE rocne_vydaje_total('1972');
 
 ------------------------
 ----- EXPLAIN PLAN -----
@@ -518,7 +566,7 @@ EXPLAIN PLAN FOR
 SELECT Priezvisko, Meno, Titul, COUNT(*) FROM pracuje NATURAL JOIN zamestnanec WHERE Specializacia = 'Statik' GROUP BY Priezvisko, Meno, Titul HAVING COUNT(*) > 1;
 
 
--- INDEX 
+-- INDEX
 CREATE INDEX zamestnanec_spec ON zamestnanec (Specializacia);
 
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
@@ -548,30 +596,15 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 --------- Selekty ----------
 ----------------------------
 
--- TODO selekt s WITH a CASE
-
-
-
------------------------
-------- mazanie -------
------------------------
-
--- zmazanie tabuliek
-
-DROP TABLE zakaznik CASCADE CONSTRAINTS;
-DROP TABLE pracuje CASCADE CONSTRAINTS;
-DROP TABLE vyplatna_listina CASCADE CONSTRAINTS;
-DROP TABLE material CASCADE CONSTRAINTS;
-DROP TABLE povereny_pracovnik CASCADE CONSTRAINTS;
-DROP TABLE vlastny_zamestnanec CASCADE CONSTRAINTS;
-DROP TABLE vybavenie CASCADE CONSTRAINTS;
-DROP TABLE externy_zamestnanec CASCADE CONSTRAINTS;
-DROP TABLE objednavka CASCADE CONSTRAINTS;
-DROP TABLE zamestnanec CASCADE CONSTRAINTS;
-
--- zmazanie sekvencií
-
-DROP SEQUENCE var_symbol_seq;
-DROP INDEX zamestnanec_spec; 
+-- Selekt roztriedi objednavky materialu, ktore sa meraju v tonach, do skuupin podla objednanej vahy
+WITH objednavky_materialu AS (SELECT Id_Objednavky, Druh, Mnozstvo, Dodavatel FROM material NATURAL JOIN objednavka WHERE Jednotka = 't') SELECT
+Id_Objednavky,
+Druh,
+CASE
+    WHEN Mnozstvo < 10 THEN 'Mala objednavka'
+    WHEN Mnozstvo BETWEEN 10 and 20 THEN 'Stredna objednavka'
+    ELSE 'Velka objednavka'
+END AS Rozsah_Objednavky
+FROM objednavky_materialu;
 
 -- Koniec súboru --

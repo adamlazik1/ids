@@ -4,8 +4,6 @@
 * Dátum: 26.03.2023
 */
 
-
-
 -----------------------
 ------- mazanie -------
 -----------------------
@@ -225,7 +223,7 @@ CREATE TABLE vlastny_zamestnanec (
     ON DELETE CASCADE
 );
 
---
+
 CREATE TABLE povereny_pracovnik(
     ID_zamestnanca NUMBER(8) PRIMARY KEY,
 
@@ -311,11 +309,11 @@ CREATE TABLE material (
 );
 
 
--------------------
------ Triggery ----
--------------------
+--------------------
+----- Triggery -----
+--------------------
 
--- V prípade ak ja upravený dátum kolaudácie na iný než NULL (teda je zadaný dátum kolaudáciu), tak pre všetky polia v tabuľke 'pracuje' pre danú zakázku nastav 'Datum_do' na daný dátum kolaudácie
+-- V prípade ak je upravený dátum kolaudácie na iný než NULL (teda je zadaný dátum kolaudáciu), tak pre všetky polia v tabuľke 'pracuje' pre danú zakázku nastav 'Datum_do' na daný dátum kolaudácie
 CREATE OR REPLACE TRIGGER update_datum_prace
 AFTER UPDATE OF Ukoncenie_vystavby ON objednavka
 FOR EACH ROW
@@ -329,8 +327,8 @@ BEGIN
 END;
 /
 
--- V pripade, ze je znamy datum ukoncenia pracovneho pomeru zamestnanca, nastavi sa tento datum ako datum ukoncenia jeho prace na objednavke, na ktorej prave pracuje
--- (a na ktorej datum jeho ukoncenia nebol pred touto udalostou znamy)
+-- V prípade, že je známy dátum ukončenia pracovného pomeru zamestnanca, nastaví sa tento dátum ako dátum ukončenia jeho práce na objednávke, na ktorej práve pracuje
+-- (a na ktorej dátum ukončenia jeho práce na objednávke nebol pred touto udalosťou známy)
 CREATE OR REPLACE TRIGGER update_ukoncenie_zamestnania
 AFTER UPDATE OF Datum_ukoncenia ON vlastny_zamestnanec
 FOR EACH ROW
@@ -432,9 +430,9 @@ VALUES ('Cement', '2', 't', 250, 'BOUMIT', TO_DATE('2013-07-05', 'yyyy/mm/dd'), 
 
 
 
----------------------------
------ Priklad trigger -----
----------------------------
+-----------------------------
+----- Príklad triggerov -----
+-----------------------------
 
 -- selekt na overenie
 SELECT * FROM pracuje;
@@ -448,7 +446,7 @@ UPDATE vlastny_zamestnanec
 SET Datum_ukoncenia = TO_DATE('2023-06-20', 'YYYY-MM-DD')
 WHERE ID_zamestnanca = 3;
 
--- selekt po prevedeni zmien
+-- selekt po prevedení zmien
 SELECT * FROM pracuje;
 
 ---------------------
@@ -532,7 +530,7 @@ BEGIN
 END;
 /
 
--- Procedúra spočíta celkové náklady za zadaný rok (platy zamestnancov + financne odmeny + cenu zakúpeného vybavenia + cenu zakupeneho materialu)
+-- Procedúra spočíta celkové náklady za zadaný rok (platy zamestnancov + finančné odmeny + cenu zakúpeného vybavenia + cenu zakúpeného materiálu)
 CREATE OR REPLACE PROCEDURE rocne_vydaje_total(rok IN VARCHAR2)
 AS
     suma_vl NUMBER := 0;
@@ -580,33 +578,36 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 ----- Prístupové práva -----
 ----------------------------
 
-
-GRANT ALL PRIVILEGES ON  pracuje TO xlasmi00;
-GRANT ALL PRIVILEGES ON  zamestnanec TO xlasmi00;
+GRANT ALL PRIVILEGES ON zakaznik TO xlasmi00;
+GRANT ALL PRIVILEGES ON objednavka TO xlasmi00;
+GRANT ALL PRIVILEGES ON zamestnanec TO xlasmi00;
+GRANT ALL PRIVILEGES ON externy_zamestnanec TO xlasmi00;
+GRANT ALL PRIVILEGES ON vlastny_zamestnanec TO xlasmi00;
+GRANT ALL PRIVILEGES ON povereny_pracovnik TO xlasmi00;
+GRANT ALL PRIVILEGES ON pracuje TO xlasmi00;
+GRANT ALL PRIVILEGES ON vyplatna_listina TO xlasmi00;
+GRANT ALL PRIVILEGES ON vybavenie TO xlasmi00;
+GRANT ALL PRIVILEGES ON material TO xlasmi00;
 
 -----------------------------
 ----- MATERIALIZED VIEW -----
 -----------------------------
 
--- Vyber vsetc
+-- Ktorí zamestnanci aktuálne pracujú na aktívnej objednávke (dátum ukončenia nie je známy, alebo je budúci dátum)
 CREATE MATERIALIZED VIEW aktualne_prace
 BUILD IMMEDIATE
 AS
 SELECT Id_Zamestnanca, Priezvisko, Meno, Cislo_Objednavky, Datum_od FROM xlazik00.zamestnanec NATURAL JOIN xlazik00.pracuje
 WHERE Datum_do IS NULL OR Datum_do > TRUNC(SYSDATE);
 
-
 SELECT * FROM aktualne_prace;
--- TODO select
--- TODO použitie
--- TODO update
 
 ----------------------------
 --------- Selekty ----------
 ----------------------------
 
--- Selekt roztriedi objednavky materialu, ktore sa meraju v tonach, do skupin podla objednanej vahy
-WITH objednavky_materialu AS (SELECT Id_Objednavky, Druh, Dodavatel, Cena, Mnozstvo, Dodavatel FROM material NATURAL JOIN objednavka WHERE Jednotka = 't') SELECT
+-- Selekt roztriedi objednávky materiálu, ktore sa merajú v tonách, do skupín podla objednanej váhy
+WITH objednavky_materialu AS (SELECT Id_Objednavky, Druh, Mnozstvo, Dodavatel FROM material NATURAL JOIN objednavka WHERE Jednotka = 't') SELECT
 Id_Objednavky,
 Druh,
 CASE
